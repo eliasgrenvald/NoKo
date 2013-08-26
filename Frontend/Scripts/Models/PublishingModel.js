@@ -1,7 +1,39 @@
 ﻿define(['knockout', 'uuid', 'initialData'], function (ko, uuid, initialData) {
     return function () {
-        var self = this;
+        var self = this,
+
+        getIdArray = function (mainArray) {
+            return ko.utils.arrayMap(mainArray(), function (item) {
+                if (item.key === undefined) {
+                    return item.id;
+                }
+                else {
+                    return item.key;
+                }
+            });
+        },
         
+        updateMainArrayBasedOnIdsArray = function (mainArray, Ids, dataArray) {
+            var newSelectedItems = [];
+            for (var i = 0; i < Ids.length; i++) {
+                for (var j = 0; j < dataArray.length; j++) {
+                    var data = dataArray[j];
+
+                    if (data.key === undefined) {
+                        if (data.id === Ids[i]) {
+                            newSelectedItems.push(data);
+                        }
+                    }
+                    else {
+                        if (data.key === Ids[i]) {
+                            newSelectedItems.push(data);
+                        }
+                    }
+                }
+            }
+            mainArray(newSelectedItems);
+        };
+
         this.id = uuid.v4();
         this.content = {
             message: ko.observable(),
@@ -26,146 +58,54 @@
         };
 
         self.channelIds = ko.computed({
-            read: function () {
-                return ko.utils.arrayMap(self.channels(), function (channel) {                    
-                    return channel.id;
-                });
+            read: function () {                
+                return getIdArray(self.channels);
             },
             write: function (value) {
-                var newSelectedItems = [],
-                channels = initialData.ChannelsData;
-                for (var i = 0; i < value.length; i++) {
-                    for (var j = 0; j < channels.length; j++) {
-                        var channel = channels[j];
-                        if (channel.id === value[i]) {
-                            newSelectedItems.push(channel);
-                        }
-                    }
-                }
-
-                self.channels(newSelectedItems);
+                updateMainArrayBasedOnIdsArray(self.channels, value, initialData.ChannelsData);
             },
             owner: self
         });
 
         self.geo.countryIds = ko.computed({
             read: function () {
-
-                return ko.utils.arrayMap(self.geo.countries(), function (country) {
-                    return country.key;
-                });
+                return getIdArray(self.geo.countries);
             },
             write: function (value) {
-                var newSelectedItems = [],
-                countries = initialData.CountriesData;
-                for (var i = 0; i < value.length; i++) {
-                    for (var j = 0; j < countries.length; j++) {
-                        var country = countries[j];
-                        if (country.key === value[i]) {
-                            newSelectedItems.push(country);
-                        }
-                    }
-                }
-
-                self.geo.countries(newSelectedItems);
+                updateMainArrayBasedOnIdsArray(self.geo.countries, value, initialData.CountriesData);
             },
             owner: self
         });
 
         self.geo.languageIds = ko.computed({
             read: function () {
-
-                return ko.utils.arrayMap(self.geo.languages(), function (language) {
-                    return language.key;
-                });
+                return getIdArray(self.geo.languages);
             },
             write: function (value) {
-                var newSelectedItems = [],
-                languages = initialData.LanguagesData;
-                for (var i = 0; i < value.length; i++) {
-                    for (var j = 0; j < languages.length; j++) {
-                        var language = languages[j];
-                        if (language.key === value[i]) {
-                            newSelectedItems.push(language);
-                        }
-                    }
-                }
-
-                self.geo.languages(newSelectedItems);
+                updateMainArrayBasedOnIdsArray(self.geo.languages, value, initialData.LanguagesData);
             },
             owner: self
         });
 
         self.geo.cityIds = ko.computed({
             read: function () {
-                return ko.utils.arrayMap(self.geo.cities(), function (city) {
-                    return city.key;
-                });
+                return getIdArray(self.geo.cities);
             },
             write: function (value) {
-                var newSelectedItems = [],
-                cities = initialData.CitiesData;
-                for (var i = 0; i < value.length; i++) {
-                    for (var j = 0; j < cities.length; j++) {
-                        var city = cities[j];
-                        if (city.key === value[i]) {
-                            newSelectedItems.push(city);
-                        }
-                    }
-                }
-
-                self.geo.cities(newSelectedItems);
+                updateMainArrayBasedOnIdsArray(self.geo.cities, value, initialData.CitiesData);
             },
             owner: self
         });
 
         self.geo.regionIds = ko.computed({
             read: function () {
-
-                return ko.utils.arrayMap(self.geo.regions(), function (region) {
-                    return region.key;
-                });
+                return getIdArray(self.geo.regions);
             },
             write: function (value) {
-                var newSelectedItems = [],
-                regions = initialData.RegionsData;
-                for (var i = 0; i < value.length; i++) {
-                    for (var j = 0; j < regions.length; j++) {
-                        var region = regions[j];
-                        if (region.key === value[i]) {
-                            newSelectedItems.push(region);
-                        }
-                    }
-                }
-
-                self.geo.regions(newSelectedItems);
+                updateMainArrayBasedOnIdsArray(self.geo.regions, value, initialData.RegionsData);
             },
             owner: self
-        });
-
-        self.geo.regionIds = ko.computed({
-            read: function () {
-
-                return ko.utils.arrayMap(self.geo.regions(), function (region) {
-                    return region.key;
-                });
-            },
-            write: function (value) {
-                var newSelectedItems = [],
-                regions = initialData.RegionsData;
-                for (var i = 0; i < value.length; i++) {
-                    for (var j = 0; j < regions.length; j++) {
-                        var region = regions[j];
-                        if (region.key === value[i]) {
-                            newSelectedItems.push(region);
-                        }
-                    }
-                }
-
-                self.geo.regions(newSelectedItems);
-            },
-            owner: self
-        });
+        });   
 
         this.init = function (obj) {
             self.id = obj.id;
